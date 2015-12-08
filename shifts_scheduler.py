@@ -1,4 +1,5 @@
 from __future__ import division
+from intervaltree import Interval, IntervalTree
 
 TIME_BLOCKS = 10
 
@@ -7,6 +8,49 @@ class Person:
     self.name = name
     self.hours_needed = hours_needed
     self.adj_hours_avail = 0
+    self.groups = []
+
+  def __repr__(self):
+    return "name: %s, hours_needed: %d, adj_hours_avail: %d, num groups: %d" % (self.name, self.hours_needed, self.adj_hours_avail, len(self.groups))
+
+  def add_group(self, start, end):
+    self.groups.append(Group(start, end, self))
+
+  def remove_group(self, group):
+    self.groups.remove(group)
+
+class Group:
+  def __init__(self, start, end, person):
+    self.start = start
+    self.end = end
+    self.intervals = [Interval(start, end, self)]
+    self.person = person
+
+  def __repr__(self):
+    return "(start: %d, end: %d)" % (self.start, self.end)
+
+  def add_interval(self, start, end):
+    self.intervals.append(Interval(start, end, group))
+
+  def remove_interval(self, interval):
+    self.intervals.remove(interval)
+    if (len(self.intervals) == 0):
+      self.person.remove_group(self)
+
+  def remove(self):
+    self.person.remove_group(self)
+
+class Interval:
+  def __init__(self, start, end, group):
+    self.start = start
+    self.end = end
+    self.group = group
+
+  def __repr__(self):
+    return "(start: %d, end: %d)" % (self.start, self.end)
+
+  def remove(self):
+    self.group.remove_interval(self)
 
 def get_times(names, starts, durations):
   times = [[] for i in range(TIME_BLOCKS)]
