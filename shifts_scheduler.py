@@ -61,13 +61,13 @@ class Person:
         return
     raise Exception("Not within group.")
 
-  def intervals_to_assign(self):
+  def find_intervals_to_assign(self):
     min_conflict = self.population.num_people + 1
-    curr_int_start = curr_int_end = min_int_start = min_int_end = 0
+    curr_int_start = curr_int_end = 0
     max_int_len = 0
     interval_list = []
 
-    for group in person.groups:
+    for group in self.groups:
       for interval in group.intervals:
         for block in interval.blocks:
           if block.num_people < min_conflict:                   ## new minimum conflict
@@ -86,6 +86,9 @@ class Person:
                 interval_list.append((curr_int_start, curr_int_end))
               curr_int_start = block.start
               curr_int_end = block.end
+    interval_list.append((curr_int_start, curr_int_end))
+
+
 
     return interval_list
 
