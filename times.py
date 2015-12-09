@@ -15,9 +15,14 @@ class Times:
     for i in range(start, end):
       self.blocks[i].add_request(person)
 
-  def remove_request(self, person, start, end):
-    for i in range(start, end):
-      self.blocks[i].remove_request(person)
+  def remove_request(self, start, end, person=None):
+    if person:
+      for i in range(start, end):
+        self.blocks[i].remove_request(person)
+    else:
+      for i in range(start, end):
+        self.blocks[i].requested_by = []
+        self.blocks[i].num_people = 0
 
 class Block:
   def __init__(self, start):

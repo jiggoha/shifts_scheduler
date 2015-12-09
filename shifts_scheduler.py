@@ -31,7 +31,7 @@ class Person:
     self.population = None
 
   def __repr__(self):
-    return "<name: %s, hours_needed: %d, adj_hours_avail: %d, num groups: %d>" % (self.name, self.hours_needed, self.adj_hours_avail, len(self.groups))
+    return "<name: %s, hours_needed: %d, score: %f, num groups: %d>" % (self.name, self.hours_needed, self.score, len(self.groups))
 
   def set_score(self):
     self.set_adj_hours_avail()
@@ -162,13 +162,14 @@ class Interval:
     else:
       raise Exception("Not within interval.")
 
-    for b in blocks:
+    for b in self.blocks:
       if start >= b.start and end <= b.end:
         b.remove_request(self.group.person)
 
 pop = Population()
-
+final_schedule = Times(0, 10)
 times = Times(0, 10)
+
 amelia = Person("Amelia", 2)
 amelia.add_group(0, 3)
 amelia.add_group(5, 6)
