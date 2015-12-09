@@ -1,8 +1,8 @@
 from __future__ import division
-from times import *
+#from intervaltree import Interval, IntervalTree
 
-TIME_BLOCKS = 10
-times = Times(0, 10)
+TIME_BLOCKS = 10    #total number of time blocks
+NUM_PEOPLE = 10     #number of people who submitted shift requests
 
 class Person:
   def __init__(self, name, hours_needed):
@@ -12,97 +12,46 @@ class Person:
     self.groups = []
 
   def __repr__(self):
-    return "<name: %s, hours_needed: %d, adj_hours_avail: %d, num groups: %d>" % (self.name, self.hours_needed, self.adj_hours_avail, len(self.groups))
+    return "name: %s, hours_needed: %d, adj_hours_avail: %d, num groups: %d" % (self.name, self.hours_needed, self.adj_hours_avail, len(self.groups))
 
   def add_group(self, start, end):
     self.groups.append(Group(start, end, self))
 
-  def delete_group(self, group):
+  def remove_group(self, group):
     self.groups.remove(group)
-
-  def slice(self, start, end):
-    for group in self.groups:
-      if start >= group.start and end <= group.end:
-        group.slice(start, end)
-        return
-    raise Exception("Not within group.")
 
 class Group:
   def __init__(self, start, end, person):
     self.start = start
     self.end = end
-    self.person = person
     self.intervals = [Interval(start, end, self)]
+    self.person = person
 
   def __repr__(self):
-    return "<start: %d, end: %d, num intervals: %d>" % (self.start, self.end, len(self.intervals))
+    return "(start: %d, end: %d)" % (self.start, self.end)
 
   def add_interval(self, start, end):
-    self.intervals.append(Interval(start, end, self))
+    self.intervals.append(Interval(start, end, group))
 
-  def delete_interval(self, interval):
+  def remove_interval(self, interval):
     self.intervals.remove(interval)
     if (len(self.intervals) == 0):
-      self.person.delete_group(self)
+      self.person.remove_group(self)
 
-  def delete(self):
+  def remove(self):
     self.person.remove_group(self)
-
-  def slice(self, start, end):
-    for interval in self.intervals:
-      if start >= interval.start and end <= interval.end:
-        interval.slice(start, end)
-        return
-    raise Exception("Not within interval.")
 
 class Interval:
   def __init__(self, start, end, group):
-    global times
-
     self.start = start
     self.end = end
     self.group = group
-    self.blocks = []
-
-    for i in range(start, end):
-      self.blocks.append(times.blocks[i])
-      times.blocks[i].add_request(group.person)
 
   def __repr__(self):
-    return "<start: %d, end: %d>" % (self.start, self.end)
+    return "(start: %d, end: %d)" % (self.start, self.end)
 
-  def delete(self):
-    self.group.delete_interval(self)
-
-  def slice(self, start, end):
-    # slice the whole thing:
-    if start == self.start and end == self.end:
-      self.delete()
-
-    # slice in the middle
-    elif start > self.start and end < self.end:
-      # create second one as a result of slice
-      self.group.add_interval(end, self.end)
-      # cut the interval to create first one
-      self.end = start
-    
-    # slice lines up in the beginning
-    elif start == self.start:
-      if self.group.start == self.start:
-        self.group.start = end
-      self.start = end
-
-    # slice lines up at the end
-    elif end == self.end:
-      if self.group.end == self.end:
-        self.group.end = start
-      self.end = start
-    else:
-      raise Exception("Not within interval.")
-
-    for b in blocks:
-      if start >= b.start and end <= b.end:
-        b.remove_request(self.group.person)
+  def remove(self):
+    self.group.remove_interval(self)
 
 def get_times(names, starts, durations):
   times = [[] for i in range(TIME_BLOCKS)]
@@ -147,12 +96,34 @@ def next_person(people):
 
   return person
 
+def find_block(person):
+  min_conflict = NUM_PEOPLE + 1
+  curr_int_start = curr_int_end = min_int_start = min_int_end
+  max_int_len = 0
+  interval_list = []
 
-# names = ["a", "b", "c", "d", "e", "c"]
-# starts = [1, 4, 1, 1, 8, 8]
-# durations = [8, 4, 2, 2, 2, 2]  
-# hours_needed = map(lambda x: x/2, durations)
-# people = make_people(names, hours_needed)
-# times = get_times(names, starts, durations)
-# set_scores(times, people)
-# order = sorted_people(people)
+  for group in person.groups:
+    for interval in group.intervals:
+      for block in interval:
+        if block.num_people < min_conflict:                   ## new minimum conflict
+          interval_list = []
+          min_conflict = block.num_people
+        elif block.num_people == min_conflict:                ## same minimum conflict
+          if block.start == curr_int_end:                       ## still part of current interval
+            curr_int_end = block.end
+          else:                                                 ## new interval
+            if curr_int_end - curr_int_start > max_int_len:       ## new maximum length
+              interval_list = [(curr_int_start, curr_int_end)]
+            elif curr_int_end - curr_int_start == max_int_len:    ## same maximum length
+              interval_list.append((curr_int_start, curr_int_end))
+            curr_int_start = curr_int_end = block.end
+
+  return interval_list
+
+
+
+
+
+
+
+
