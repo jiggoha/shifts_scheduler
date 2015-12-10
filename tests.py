@@ -1,56 +1,60 @@
-def test1():
-  pop = Population()
-  final_schedule = Times(0, 10)
-  times = Times(0, 10)
+from shifts_scheduler import *
 
-  amelia = Person("Amelia", 2)
-  amelia.add_group(0, 3)
-  amelia.add_group(5, 6)
+##### TEST 1 ######
 
-  jay = Person("Jay", 3)
-  jay.add_group(2, 8)
+pop = Population()
+# final_schedule = Times(0, 10)
+# times = Times(0, 10)
 
-  alex = Person("Alex", 2)
-  alex.add_group(6, 10)
+amelia = Person("Amelia", 2)
+amelia.add_group(0, 3)
+amelia.add_group(5, 6)
 
-  frances = Person("Frances", 2)
-  frances.add_group(1, 3)
-  frances.add_group(8, 10)
+jay = Person("Jay", 3)
+jay.add_group(2, 8)
 
-  shona = Person("Shona", 1)
-  shona.add_group(5, 7)
-  
-  pop.add_person([a,b,c,d,e])
+alex = Person("Alex", 2)
+alex.add_group(6, 10)
 
-  for person in pop.people:
-    person.set_score()
+frances = Person("Frances", 2)
+frances.add_group(1, 3)
+frances.add_group(8, 10)
 
-  pop.sort()
+shona = Person("Shona", 1)
+shona.add_group(5, 7)
 
-def test2():
-  pop = Population()
-  final_schedule = Times(0, 10)
-  times = Times(0, 10)
+pop.add_person([amelia,jay,alex,frances,shona])
 
-  a = Person("A", 4)
-  a.add_group(1, 9)
+for person in pop.people:
+  person.set_score()
 
-  b = Person("B", 2)
-  b.add_group(4, 8)
+pop.sort()
 
-  c = Person("C", 2)
-  c.add_group(1, 3)
-  c.add_group(8, 10)
+##### TEST 2 ######
 
-  d = Person("D", 1)
-  d.add_group(1, 3)
+pop = Population()
+final_schedule = Times(0, 10)
+times = Times(0, 10)
 
-  e = Person("E", 1)
-  e.add_group(8, 10)
+a = Person("A", 4)
+a.add_group(1, 9)
 
-  pop.add_person([a,b,c,d,e])
+b = Person("B", 2)
+b.add_group(4, 8)
 
-  for person in pop.people:
-    person.set_score()
+c = Person("C", 2)
+c.add_group(1, 3)
+c.add_group(8, 10)
 
-  pop.sort()
+d = Person("D", 1)
+d.add_group(1, 3)
+
+e = Person("E", 1)
+e.add_group(8, 10)
+
+pop.add_person([a,b,c,d,e])
+
+for person in pop.people:
+  person.set_score()
+
+pop.sort()
