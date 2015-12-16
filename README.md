@@ -26,3 +26,48 @@ The following heuristics are used to assign the time slots to the most inflexibl
 * ~~If the time slot to be assigned must break up another student's request to two (since the second student cannot work during the hours that will be assigned to the most inflexible student), then choose the time slot such that it breaks up the other students slot most unevenness.~~
 
 Once a time slot for the most inflexible student is chosen, recalculate the inflexibility scores of all students who were affected. Repeat choosing most inflexible student to assign a shift to, until either all students have their hours fulfilled or until there are no time slots left which can be assigned.
+
+## Implementation
+##### Format of input
+Example:
+```
+Name,HoursNeeded,Start1,End1,...
+A,4,1,9
+B,2,4,8
+C,2,1,3,8,10
+D,1,1,3
+E,1,8,10
+```
+
+##### Sample Input and Output
+Requested shifts:
+```
+0    1    2    3    4    5    6    7    8    9    10    
+|----|----|----|----|----|----|----|----|----|----|
+
+     |---------------------------------------|        A
+                    |-------------------|             B
+     |---------|                        |---------|   C
+     |---------|                                      D
+                                        |---------|   E
+
+|----|----|----|----|----|----|----|----|----|----|
+0    1    2    3    4    5    6    7    8    9    10
+```
+
+Assigned shifts:
+```
+0    1    2    3    4    5    6    7    8    9    10    
+|----|----|----|----|----|----|----|----|----|----|
+
+               |----|         |--------------|        A
+                    |---------|                       B
+     |---------|                                      C
+                                                      D
+                                             |----|   E
+
+|----|----|----|----|----|----|----|----|----|----|
+0    1    2    3    4    5    6    7    8    9    10    
+
+Warning: D still needs 1 more hours.
+```
