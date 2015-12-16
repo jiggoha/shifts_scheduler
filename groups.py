@@ -1,3 +1,5 @@
+from intervals import *
+
 class Group:
   def __init__(self, start, end, person):
     self.start = start

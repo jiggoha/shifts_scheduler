@@ -1,5 +1,4 @@
-from __future__ import division
-from times import *
+from groups import *
 
 class Population:
   def __init__(self):
