@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from __future__ import division
+from __future__ import print_function
 
 import pdb
 import csv
@@ -207,10 +208,56 @@ class Times:
   def __repr__(self):
     return "<start: %d, end: %d>" % (self.start, self.end)
 
-  def pretty_print(self, population):
+  def pretty_print_assigned(self, population):
+    # print "timeline"
+    for i in range(self.total_hours + 1):
+      print("%d    " % (i), end = "")
+    print("\n", end = "")
+
     for i in range(self.total_hours):
-      print("%d    " % (i))
-    print("\n")
+      print("|----", end = "")
+    print("|\n")
+
+    # print people's shifts
+    for person in population.people:
+      shifts = sorted(person.final)
+      
+      in_shift = False
+      print_four = False
+      for i in range(self.total_hours):
+        if person in self.blocks[i].requested_by:
+          if not in_shift:
+            print("|----", end = "")
+          else:
+            print("-----", end = "")
+          in_shift = True
+        else:
+          if print_four:
+            print("    ", end = "")
+            print_four = False
+          else:
+            print("     ", end = "")
+    
+        # end of a shift
+        if (i + 1) < self.total_hours and in_shift and person not in self.blocks[i + 1].requested_by:
+          print("|", end = "")
+          in_shift = False
+          print_four = True
+
+      if in_shift:
+        print("|  ", person.name)
+      else:
+        print("   ", person.name)
+
+    # print "timeline"
+    print("\n", end = "")
+    for i in range(self.total_hours):
+      print("|----", end = "")
+    print("|")
+
+    for i in range(self.total_hours + 1):
+      print("%d    " % (i), end = "")
+    print("\n", end = "")
 
   def add_request(self, person, start, end):
     for i in range(start, end):
@@ -313,32 +360,28 @@ def assign_shift(shift, person):
     person.set_score()
 
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
+  TOTAL_HOURS = int(sys.argv[2])
+  times = Times(0, TOTAL_HOURS)
+  final_schedule = Times(0, TOTAL_HOURS)
 
-TOTAL_HOURS = int(sys.argv[2])
-times = Times(0, TOTAL_HOURS)
-final_schedule = Times(0, TOTAL_HOURS)
+  pop = Population()
 
-pop = Population()
+  filepath = sys.argv[1]
+  with open(filepath, 'rb') as csvfile:
+    filereader = csv.reader(csvfile, delimiter=',')
+    next(filereader, None)  #skip header
+    for row in filereader:
+      (name, hours_needed), starts_ends = row[:2], row[2:]
+      person = Person(name, int(hours_needed))
+      pop.add_person([person])
+      for i in range(0, len(starts_ends), 2):
+        start = int(starts_ends[i])
+        end = int(starts_ends[i+1])
 
-filepath = sys.argv[1]
-with open(filepath, 'rb') as csvfile:
-  filereader = csv.reader(csvfile, delimiter=',')
-  next(filereader, None)  #skip header
-  for row in filereader:
-    (name, hours_needed), starts_ends = row[:2], row[2:]
-    person = Person(name, int(hours_needed))
-    pop.add_person([person])
-    for i in range(0, len(starts_ends), 2):
-      start = int(starts_ends[i])
-      end = int(starts_ends[i+1])
+        person.add_group(start, end)
+        for j in range(start, end):
+          times.blocks[j].add_request(person)
 
-      person.add_group(start, end)
-      for j in range(start, end):
-        times.blocks[j].add_request(person)
-
-schedule_shifts()
-
-print(final_schedule.blocks)
-
-
+  print(final_schedule.blocks)
+  schedule_shifts()
