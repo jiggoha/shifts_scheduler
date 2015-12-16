@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from __future__ import division
+from __future__ import print_function
 
 import pdb
 import csv
@@ -209,9 +210,28 @@ class Times:
     return "<start: %d, end: %d>" % (self.start, self.end)
 
   def pretty_print(self, population):
+    # print "timeline"
+    for i in range(self.total_hours + 1):
+      print("%d    " % (i), end = "")
+    print("\n", end = "")
+
     for i in range(self.total_hours):
-      print("%d    " % (i))
-    print("\n")
+      print("|----", end = "")
+    print("|\n")
+
+    # print people's shifts
+    for person in population.people:
+      shifts = sorted(person.final)
+
+    # print "timeline"
+    print("\n", end = "")
+    for i in range(self.total_hours):
+      print("|----", end = "")
+    print("|")
+
+    for i in range(self.total_hours + 1):
+      print("%d    " % (i), end = "")
+    print("\n", end = "")
 
   def add_request(self, person, start, end):
     for i in range(start, end):
@@ -259,7 +279,6 @@ def schedule_shifts():
     for person in pop.people:
       person.set_score()
     order = pop.sort()
-    pdb.set_trace()
     while(order[0].hours_needed != 0):
       intervals = order[0].find_intervals_to_assign()
 
@@ -294,27 +313,26 @@ def assign_shift(shift, person):
     person.set_score
 
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
+  TOTAL_HOURS = int(sys.argv[2])
+  times = Times(0, TOTAL_HOURS)
+  final_schedule = Times(0, TOTAL_HOURS)
 
-TOTAL_HOURS = int(sys.argv[2])
-times = Times(0, TOTAL_HOURS)
-final_schedule = Times(0, TOTAL_HOURS)
+  pop = Population()
 
-pop = Population()
+  filepath = sys.argv[1]
+  with open(filepath, 'rb') as csvfile:
+    filereader = csv.reader(csvfile, delimiter=',')
+    next(filereader, None)  #skip header
+    for row in filereader:
+      (name, hours_needed), starts_ends = row[:2], row[2:]
+      person = Person(name, int(hours_needed))
+      pop.add_person([person])
+      for i in range(0, len(starts_ends), 2):
+        person.add_group(int(starts_ends[i]), int(starts_ends[i+1]))
 
-filepath = sys.argv[1]
-with open(filepath, 'rb') as csvfile:
-  filereader = csv.reader(csvfile, delimiter=',')
-  next(filereader, None)  #skip header
-  for row in filereader:
-    (name, hours_needed), starts_ends = row[:2], row[2:]
-    person = Person(name, int(hours_needed))
-    pop.add_person([person])
-    for i in range(0, len(starts_ends), 2):
-      person.add_group(int(starts_ends[i]), int(starts_ends[i+1]))
+  for person in pop.people:
+    print(person)
 
-for person in pop.people:
-  print(person)
-
-schedule_shifts()
-
+  pdb.set_trace()
+  schedule_shifts()
