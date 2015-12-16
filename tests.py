@@ -33,8 +33,8 @@ pop.sort()
 ##### TEST 2 ######
 
 pop = Population()
-final_schedule = Times(0, 10)
-times = Times(0, 10)
+# final_schedule = Times(0, 10)
+# times = Times(0, 10)
 
 a = Person("A", 4)
 a.add_group(1, 9)

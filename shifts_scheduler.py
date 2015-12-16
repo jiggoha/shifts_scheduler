@@ -1,9 +1,47 @@
 import pdb
+import csv
 
 from times import *
 from people import *
+from intervals import *
+from groups import *
 
-final_schedule = Times(0, TOTAL_HOURS)
+if __name__ == '__main__':
+  TOTAL_HOURS = sys.argv[2]
+  times = Times(0, TOTAL_HOURS)
+  final_schedule = Times(0, TOTAL_HOURS)
+
+  pop = Population()
+
+  filepath = sys.argv[1]
+  with open(filepath, 'rb') as csvfile:
+    filereader = csv.reader(csvfile, delimiter=',')
+    next(filereader, None)  #skip header
+    for row in filereader:
+      (name, hours_needed), starts_ends = row[:2], row[2:]
+      person = Person(name, hours_needed)
+      pop.add_person(person)
+      for i in range(0, len(starts_ends), 2):
+        person.add_group(starts_ends[i], starts_ends[i+1])
+
+  for person in pop.people:
+    print(person)
+    
+  schedule_shifts()
+
+
+def schedule_shifts():
+
+    order = pop.sort()
+    while(order[0].hours_needed != 0):
+      intervals = order[0].find_intervals_to_assign()
+
+      #interval choice heuristics
+      interval = intervals[0]
+
+      assign_shift(interval, person)
+      order = pop.sort()
+
 
 def assign_shift(shift, person):
 
