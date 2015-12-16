@@ -330,10 +330,10 @@ def schedule_shifts():
             minimum_start = possible_start
         interval = (minimum_start, minimum_start + dur)
 
+    
       assign_shift(interval, person)
       order = pop.sort()
       person = order[0]
-      print(final_schedule.blocks)
 
 
 
@@ -350,6 +350,9 @@ def assign_shift(shift, person):
     to_remove = list(person.groups)
     for group in to_remove:
       person.delete_group(group)
+    for block in times.blocks:
+      if person in block.requested_by:
+        block.requested_by.remove(person)
 
   for block in times.blocks[start:end]:
     to_slice = list(block.requested_by)
@@ -383,5 +386,7 @@ if __name__ == '__main__':
         for j in range(start, end):
           times.blocks[j].add_request(person)
 
-  print(final_schedule.blocks)
   schedule_shifts()
+  final_schedule.pretty_print_assigned(pop)
+  print("Times")
+  times.pretty_print_assigned(pop)
