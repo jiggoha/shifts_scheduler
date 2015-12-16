@@ -40,7 +40,6 @@ class Group:
 
 class Interval:
   def __init__(self, start, end, group):
-    global times
 
     self.start = start
     self.end = end
@@ -49,7 +48,6 @@ class Interval:
 
     for i in range(start, end):
       self.blocks.append(times.blocks[i])
-      times.blocks[i].add_request(group.person)
 
   def __repr__(self):
     return "<start: %d, end: %d>" % (self.start, self.end)
@@ -261,16 +259,35 @@ def schedule_shifts():
       person.set_score()
     order = pop.sort()
     person = order[0]
-    pdb.set_trace()
+
     while(person.hours_needed != 0):
       intervals = person.find_intervals_to_assign()
 
       #interval choice heuristics
       interval = intervals[0]
+      start = interval[0]
+      end = interval[1]
+      dur = person.hours_needed
+      if(end - start > dur):
+        minimum = sys.maxint
+        minimum_start = start
+        
+        for possible_start in range(start, end-dur+1):
+          effect = 0
+          for i in range(possible_start, possible_start + dur):
+            people_affected = times.blocks[i].requested_by
+            for person_affected in people_affected:
+              effect += person_affected.score
+          if effect < minimum:
+            minimum = effect
+            minimum_start = possible_start
+        interval = (minimum_start, minimum_start + dur)
 
       assign_shift(interval, person)
       order = pop.sort()
       person = order[0]
+      print(final_schedule.blocks)
+
 
 
 def assign_shift(shift, person):
@@ -283,19 +300,17 @@ def assign_shift(shift, person):
   person.final.append((start, end))
   person.hours_needed -= dur
   if person.hours_needed == 0:
-    to_remove = person.groups
+    to_remove = list(person.groups)
     for group in to_remove:
       person.delete_group(group)
 
-  affected_persons = []
   for block in times.blocks[start:end]:
-    to_slice = block.requested_by
+    to_slice = list(block.requested_by)
     for person in to_slice:
       person.slice(block.start, block.end)
-    affected_persons = list(set(affected_persons)|set(to_slice))
 
-  for person in affected_persons:
-    person.set_score
+  for person in pop.people:
+    person.set_score()
 
 
 #if __name__ == '__main__':
@@ -315,7 +330,15 @@ with open(filepath, 'rb') as csvfile:
     person = Person(name, int(hours_needed))
     pop.add_person([person])
     for i in range(0, len(starts_ends), 2):
-      person.add_group(int(starts_ends[i]), int(starts_ends[i+1]))
+      start = int(starts_ends[i])
+      end = int(starts_ends[i+1])
+
+      person.add_group(start, end)
+      for j in range(start, end):
+        times.blocks[j].add_request(person)
 
 schedule_shifts()
+
+print(final_schedule.blocks)
+
 
