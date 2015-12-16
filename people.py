@@ -1,4 +1,3 @@
-from groups import *
 
 class Population:
   def __init__(self):
