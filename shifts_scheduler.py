@@ -210,7 +210,7 @@ class Times:
   def __repr__(self):
     return "<start: %d, end: %d>" % (self.start, self.end)
 
-  def pretty_print(self, population):
+  def pretty_print_assigned(self, population):
     # print "timeline"
     for i in range(self.total_hours + 1):
       print("%d    " % (i), end = "")
@@ -223,6 +223,33 @@ class Times:
     # print people's shifts
     for person in population.people:
       shifts = sorted(person.final)
+      
+      in_shift = False
+      print_four = False
+      for i in range(self.total_hours):
+        if person in self.blocks[i].requested_by:
+          if not in_shift:
+            print("|----", end = "")
+          else:
+            print("-----", end = "")
+          in_shift = True
+        else:
+          if print_four:
+            print("    ", end = "")
+            print_four = False
+          else:
+            print("     ", end = "")
+    
+        # end of a shift
+        if (i + 1) < self.total_hours and in_shift and person not in self.blocks[i + 1].requested_by:
+          print("|", end = "")
+          in_shift = False
+          print_four = True
+
+      if in_shift:
+        print("|  ", person.name)
+      else:
+        print("   ", person.name)
 
     # print "timeline"
     print("\n", end = "")
@@ -336,8 +363,22 @@ if __name__ == '__main__':
       for i in range(0, len(starts_ends), 2):
         person.add_group(int(starts_ends[i]), int(starts_ends[i+1]))
 
+      if person.name == "Amelia":
+        person.final = [(0,2)]
+
+      if person.name == "Jay":
+        person.final = [(2,5)]
+
+      if person.name == "Shona":
+        person.final = [(5,6)]
+
+      if person.name == "Alex":
+        person.final = [(6,8)]
+
+      if person.name == "Frances":
+        person.final = [(9,10), (8,9)]
+
   for person in pop.people:
     print(person)
 
-  pdb.set_trace()
   schedule_shifts()
