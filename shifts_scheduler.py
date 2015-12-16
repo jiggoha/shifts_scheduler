@@ -363,21 +363,6 @@ if __name__ == '__main__':
       for i in range(0, len(starts_ends), 2):
         person.add_group(int(starts_ends[i]), int(starts_ends[i+1]))
 
-      if person.name == "Amelia":
-        person.final = [(0,2)]
-
-      if person.name == "Jay":
-        person.final = [(2,5)]
-
-      if person.name == "Shona":
-        person.final = [(5,6)]
-
-      if person.name == "Alex":
-        person.final = [(6,8)]
-
-      if person.name == "Frances":
-        person.final = [(9,10), (8,9)]
-
   for person in pop.people:
     print(person)
 
