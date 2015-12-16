@@ -3,6 +3,7 @@ class Times:
     self.start = start
     self.end = end
     self.blocks = []
+    self.total_hours = end
 
     for i in range(end - start):
       b = Block(start + i)
@@ -10,6 +11,11 @@ class Times:
 
   def __repr__(self):
     return "<start: %d, end: %d>" % (self.start, self.end)
+
+  def pretty_print(self, population):
+    for i in range(self.total_hours):
+      print("%d    " % (i))
+    print("\n")
 
   def add_request(self, person, start, end):
     for i in range(start, end):
@@ -44,11 +50,3 @@ class Block:
     self.requested_by.remove(person)
     self.num_people -= 1
     # TODO: update people?
-
-
-
-
-
-
-
-
