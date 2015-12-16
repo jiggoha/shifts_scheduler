@@ -128,6 +128,7 @@ class Person:
     self.score = 0
     self.groups = []
     self.population = None
+    self.final = []
 
   def __repr__(self):
     return "<name: %s, hours_needed: %d, score: %f, num groups: %d>" % (self.name, self.hours_needed, self.score, len(self.groups))
@@ -259,15 +260,17 @@ def schedule_shifts():
     for person in pop.people:
       person.set_score()
     order = pop.sort()
+    person = order[0]
     pdb.set_trace()
-    while(order[0].hours_needed != 0):
-      intervals = order[0].find_intervals_to_assign()
+    while(person.hours_needed != 0):
+      intervals = person.find_intervals_to_assign()
 
       #interval choice heuristics
       interval = intervals[0]
 
       assign_shift(interval, person)
       order = pop.sort()
+      person = order[0]
 
 
 def assign_shift(shift, person):
@@ -277,6 +280,7 @@ def assign_shift(shift, person):
   dur = end - start
 
   final_schedule.add_request(person, start, end)
+  person.final.append((start, end))
   person.hours_needed -= dur
   if person.hours_needed == 0:
     to_remove = person.groups
@@ -312,9 +316,6 @@ with open(filepath, 'rb') as csvfile:
     pop.add_person([person])
     for i in range(0, len(starts_ends), 2):
       person.add_group(int(starts_ends[i]), int(starts_ends[i+1]))
-
-for person in pop.people:
-  print(person)
 
 schedule_shifts()
 
