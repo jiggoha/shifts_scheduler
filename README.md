@@ -38,9 +38,13 @@ In addition to the main algorithm, the following heuristics are used to assign t
 Once a time slot for the most inflexible student is chosen, recalculate the inflexibility scores of all students who were affected. Repeat choosing most inflexible student to assign a shift to, until either all students have their hours fulfilled or until there are no time slots left which can be assigned.
 
 ## Implementation
-##### Format of input
+##### Format of input/Output
+Input:
+CSV file. First line must be the number of total time slots managers would like assigned, second line is a header to show proper formatting (will be discarded), all subsequent lines must be of format Name,HoursNeeded,Start1,End1,...
+
 Example:
 ```
+TotalTimeSlots,10
 Name,HoursNeeded,Start1,End1,...
 A,4,1,9
 B,2,4,8
@@ -48,8 +52,11 @@ C,2,1,3,8,10
 D,1,1,3
 E,1,8,10
 ```
+Output: 
+The script will write to stdout an explanation of each of the steps it took to assign shifts, along with pictures showing the remaining shift preferences after each assignment. Our program will also print a warning for each student who was assigned fewer shifts than he/she requested.
+A note about redirection: In order to show more clearly the steps taken by the algorithm, colors have been added to highlight certain lines in the explanation. When redirecting stdout to a file, be aware that there may be some formatting strings added by bash to the file. These will return to colors when the file is cat'ed in the shell.
 
-##### Sample Input and Output
+##### Sample Input and Solution
 Requested shifts:
 ```
 0    1    2    3    4    5    6    7    8    9    10    
