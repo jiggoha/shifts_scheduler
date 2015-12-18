@@ -6,6 +6,16 @@ import pdb
 import csv
 import sys
 
+class bcolors:
+  HEADER = '\033[95m'
+  OKBLUE = '\033[94m'
+  OKGREEN = '\033[92m'
+  WARNING = '\033[93m'
+  FAIL = '\033[91m'
+  ENDC = '\033[0m'
+  BOLD = '\033[1m'
+  UNDERLINE = '\033[4m'
+
 ####################################  intervals.py  #############################################################
 ####################################  intervals.py  #############################################################
 ####################################  intervals.py  #############################################################
@@ -286,14 +296,10 @@ class Block:
   def add_request(self, person):
     self.requested_by.append(person)
     self.num_people += 1
-    # TODO: update people?
 
   def remove_request(self, person):
     self.requested_by.remove(person)
     self.num_people -= 1
-    # TODO: update people?
-
-
 
 ############################################# main ########################################################
 ############################################# main ########################################################
@@ -301,69 +307,83 @@ class Block:
 ############################################# main ########################################################
 
 def schedule_shifts():
+  for person in pop.people:
+    person.set_score()
+  order = pop.sort()
+  person = order[0]
 
-    for person in pop.people:
-      person.set_score()
+  while(person.hours_needed != 0):
+    print(bcolors.WARNING + "Current requests schedule:" + bcolors.ENDC)
+    times.pretty_print_assigned(pop)
+    print("\n")
+
+    print("\n")
+    print(bcolors.OKGREEN + "Since " + person.name + " is most inflexible person with a score of " + str(person.score) + ", they will be assigned hours next." + bcolors.ENDC)
+
+    intervals = person.find_intervals_to_assign()
+
+    # interval choice heuristics
+    interval = intervals[0]
+    start, end = interval
+    duration = person.hours_needed
+    if(end - start > duration):
+      minimum = sys.maxint
+      minimum_start = start
+      
+      for possible_start in range(start, end - duration + 1):
+        effect = 0
+        for i in range(possible_start, possible_start + duration):
+          people_affected = times.blocks[i].requested_by
+          for person_affected in people_affected:
+            effect += person_affected.score
+        if effect < minimum:
+          minimum = effect
+          minimum_start = possible_start
+      interval = (minimum_start, minimum_start + duration)
+
+    print("\t" + person.name + " has been assigned a shift from " + str(start) + " to " + str(end) + ", which is least likely to conflict with another student later on.")
+    assign_shift(interval, person)
+
     order = pop.sort()
     person = order[0]
-
-    while(person.hours_needed != 0):
-      intervals = person.find_intervals_to_assign()
-
-      #interval choice heuristics
-      interval = intervals[0]
-      start = interval[0]
-      end = interval[1]
-      dur = person.hours_needed
-      if(end - start > dur):
-        minimum = sys.maxint
-        minimum_start = start
-        
-        for possible_start in range(start, end-dur+1):
-          effect = 0
-          for i in range(possible_start, possible_start + dur):
-            people_affected = times.blocks[i].requested_by
-            for person_affected in people_affected:
-              effect += person_affected.score
-          if effect < minimum:
-            minimum = effect
-            minimum_start = possible_start
-        interval = (minimum_start, minimum_start + dur)
-
-    
-      assign_shift(interval, person)
-      order = pop.sort()
-      person = order[0]
 
 
 
 def assign_shift(shift, person):
-
   start = shift[0]
   end = shift[1]
-  dur = end - start
+  duration = end - start
 
   final_schedule.add_request(person, start, end)
   person.final.append((start, end))
-  person.hours_needed -= dur
+  person.hours_needed -= duration
+
   if person.hours_needed == 0:
+    print("\t" + person.name + "'s requested time has been satifised by being assigned " + str(duration) + " more hours.")
+
     to_remove = list(person.groups)
     for group in to_remove:
       person.delete_group(group)
     for block in times.blocks:
       if person in block.requested_by:
         block.requested_by.remove(person)
+  else:
+    print("\t%s has been assigned %d more hours, and still needs %d hours." %  (person.name, duration, person.hours_needed))
+    
 
   for block in times.blocks[start:end]:
     to_slice = list(block.requested_by)
     for person in to_slice:
       person.slice(block.start, block.end)
 
-  for person in pop.people:
-    person.set_score()
+  for p in pop.people:
+    p.set_score()
 
 
 if __name__ == '__main__':
+  if len(sys.argv) != 3:
+    sys.exit("Usage: shifts_scheduler input_path num_blocks")
+
   TOTAL_HOURS = int(sys.argv[2])
   times = Times(0, TOTAL_HOURS)
   final_schedule = Times(0, TOTAL_HOURS)
@@ -373,7 +393,8 @@ if __name__ == '__main__':
   filepath = sys.argv[1]
   with open(filepath, 'rb') as csvfile:
     filereader = csv.reader(csvfile, delimiter=',')
-    next(filereader, None)  #skip header
+    next(filereader, None)  # skip header
+    
     for row in filereader:
       (name, hours_needed), starts_ends = row[:2], row[2:]
       person = Person(name, int(hours_needed))
@@ -386,7 +407,23 @@ if __name__ == '__main__':
         for j in range(start, end):
           times.blocks[j].add_request(person)
 
+  print(bcolors.FAIL + bcolors.BOLD + "This log explains each step in the decision process. For a larger overview of the problem and our approach, please see the README.md.")
+  print("\n", end = "")
+  print("Project hosted at https://github.com/jiggoha/shifts_scheduler" + bcolors.ENDC)
+  print("\n")
+
   schedule_shifts()
+
+  print("\n")
+  print(bcolors.OKBLUE + "Final schedule:\n" + bcolors.ENDC)
   final_schedule.pretty_print_assigned(pop)
-  print("Times")
-  times.pretty_print_assigned(pop)
+
+  print("\n")
+  for person in pop.people:
+    if person.hours_needed != 0:
+      print(bcolors.WARNING + "Warning: " + person.name + " still needs " + str(person.hours_needed) + " more hours." + bcolors.ENDC)
+
+  print("\n")
+  print(bcolors.FAIL + bcolors.BOLD + "This log explains each step in the decision process. For a larger overview of the problem and our approach, please see the README.md.")
+  print("\n", end = "")
+  print("Project hosted at https://github.com/jiggoha/shifts_scheduler" + bcolors.ENDC)

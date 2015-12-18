@@ -1,5 +1,7 @@
 # Shifts Scheduler
 Final project for Automated Decision Systems (CPSC 458)
+Project by Amelia Holcomb and Jay Hou.
+Hosted at https://github.com/jiggoha/shifts_scheduler
 
 ## Goal
 The Yale Student Technology Collaborative (STC) hires over a hundred students each semester to staff the library's technology help walk-in office hours. It is important for the office to be supported during the day since students and faculty depend on its service. Therefore, when the STC managers assign shifts to student employees, they must take into account not only the time preferences of the employee, but also the constraint of ensuring that the office is staffed. For our final project, we decided to automate the process of deciding how to assign shifts to students based off of their time preferences.
