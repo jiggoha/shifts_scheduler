@@ -15,7 +15,7 @@ On top of this, we also used a rule-based system to decide which shift (out of m
 ## Constraints
 1. Shift schedules are weekly. That is, the schedule recycles after each week.
 2. Each student submits time preferences in shifts with a start time and end time for the week. They must input twice the number of hours they would like to work in order to give managers flexibility in assignment.
-3. If a student submits one time slot, managers may elect to grant the student the entire time slot, a portion of the time slot, or not at all. ~~The managers should not assign two non-continuous portions of the same original time slot that the student requested.~~
+3. If a student submits one time slot, managers may elect to grant the student the entire time slot, a portion of the time slot, or not at all. 
 4. The managers should do their best to meet the number of hours students would like to work. In the case that it is not possible to both meet the hours students would like to work and ensure that the office is always staffed, managers should give preference to students at the expense of the office's open hours.
 
 ## Abstractions
@@ -82,5 +82,6 @@ Warning: D still needs 1 more hours.
 
 ## Future Steps
 With more time, there are a couple of additional heuristics/rule-based decisions that we would like to have implemented. 
-#####1. Prefer not to assign students multiple non-continuous shifts within the same five hours whenever possible.
-#####2. If the time slot to be assigned must break up another student's request to two (since the second student cannot work during the hours that will be assigned to the most inflexible student), then choose the time slot such that it breaks up the other student's slot most unevenly.
+
+1. Prefer not to assign students multiple non-continuous shifts within the same five hours whenever possible.
+2. If the time slot to be assigned must break up another student's request to two (since the second student cannot work during the hours that will be assigned to the most inflexible student), then choose the time slot such that it breaks up the other student's slot most unevenly.
