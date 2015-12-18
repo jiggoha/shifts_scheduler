@@ -1,6 +1,8 @@
 # Shifts Scheduler
 Final project for Automated Decision Systems (CPSC 458)
+
 Project by Amelia Holcomb and Jay Hou.
+
 Hosted at https://github.com/jiggoha/shifts_scheduler
 
 ## Goal
@@ -10,9 +12,11 @@ The Yale Student Technology Collaborative (STC) hires over a hundred students ea
 Our algorithm falls within the domain of scheduling problems. Many scheduling problems have been completely optimized by scheduling algorithms, which makes them less of a "decision system" -- there is no choice involved, because a "perfect" solution can be reached. However, we chose a scheduling problem that is more loosely defined. It is not always clear what the optimal solution should be, or if there even is one. Our algorithm tries to reconcile multiple student preferences with manager needs, proceeding at times as a human might when trying to judge the situation.
 
 ## Decision Methods Employed
-Our algorithm employed a mathematical formulation of value, together with a rule-based system, to decide how to assign shifts. 
-For the mathematical formula, we were inspired by the NPV calculations used to determine when to buy and sell stocks. In that decision system, the computer used a specific mathematically derived formula to decide when to buy and sell a stock based on its assessed value. For our project, we needed a way to decide when to assign a shift to a student, based on our assessment of the student's flexibility (likelihood of being able to take another, less popular, shift later on in the algorithm). We created our own mathematical formula to assess this "flexibility score", and it is that formula that governs which student we preference in assigning shifts at any given time. (See Algorithm)
-On top of this, we also used a rule-based system to decide which shift (out of many possible preferences) to assign to a given student. We made rules to determine which shift intervals, if assigned, were more likely to lead to a successful solution. (See Algorithm) With more time, we would have added further rule-based heuristics to improve upon our solution. (See Future Steps)
+Our algorithm employed a mathematical formulation of value, together with a rule-based system, to decide how to assign shifts. For the mathematical formula, we were inspired by the NPV calculations used to determine when to buy and sell stocks. In that decision system, the computer used a specific mathematically derived formula to decide when to buy and sell a stock based on its assessed value.
+
+We needed a way to decide when to assign a shift to a student, based on our assessment of the student's inflexibility (likelihood of being able to take another, less popular, shift later on in the algorithm). We created our own mathematical formula to assess this "inflexibility score", and it is that formula that governs which student we preference in assigning shifts at any given time. (See [Algorithm](https://github.com/jiggoha/shifts_scheduler#algorithm))
+
+On top of this, we also used a rule-based system to decide which shift (out of many possible preferences) to assign to a given student. We made rules to determine which shift intervals, if assigned, were more likely to lead to a successful solution. (See [Algorithm](https://github.com/jiggoha/shifts_scheduler#algorithm))
 
 ## Constraints
 1. Shift schedules are weekly. That is, the schedule recycles after each week.
@@ -21,7 +25,7 @@ On top of this, we also used a rule-based system to decide which shift (out of m
 4. The managers should do their best to meet the number of hours students would like to work. In the case that it is not possible to both meet the hours students would like to work and ensure that the office is always staffed, managers should give preference to students at the expense of the office's open hours.
 
 ## Abstractions
-1. Instead of working with datetime objects, our algorithm takes in time as absolute, discrete numbers. The period of a schedule is also taken as input.
+Instead of working with datetime objects, our algorithm takes in time as absolute, discrete numbers. The period of a schedule is also taken as input.
 
 ## Algorithm
 #####1. Order of people assignment
@@ -33,14 +37,13 @@ Our algorithm greedily assigns shifts to the most inflexible student. Once it id
 #####2. Order of time slots assignment
 In addition to the main algorithm, the following heuristics are used to assign the time slots to the most inflexible student:
 * Select the time slot that minimizes the sum of increased inflexibility scores for all students affected by this assignment
-(See also Future Steps)
+* (See also [Future Steps](https://github.com/jiggoha/shifts_scheduler#future-steps))
 
 Once a time slot for the most inflexible student is chosen, recalculate the inflexibility scores of all students who were affected. Repeat choosing most inflexible student to assign a shift to, until either all students have their hours fulfilled or until there are no time slots left which can be assigned.
 
 ## Implementation
-##### Format of input/Output
-Input:
-CSV file. First line must be the number of total time slots managers would like assigned, second line is a header to show proper formatting (will be discarded), all subsequent lines must be of format Name,HoursNeeded,Start1,End1,...
+##### Format of inpu and output
+Input: CSV file. First line must be the number of total time slots managers would like assigned, second line is a header to show proper formatting (will be discarded), all subsequent lines must be of format Name,HoursNeeded,Start1,End1,...
 
 Example:
 ```
@@ -52,9 +55,7 @@ C,2,1,3,8,10
 D,1,1,3
 E,1,8,10
 ```
-Output: 
-The script will write to stdout an explanation of each of the steps it took to assign shifts, along with pictures showing the remaining shift preferences after each assignment. Our program will also print a warning for each student who was assigned fewer shifts than he/she requested.
-A note about redirection: In order to show more clearly the steps taken by the algorithm, colors have been added to highlight certain lines in the explanation. When redirecting stdout to a file, be aware that there may be some formatting strings added by bash to the file. These will return to colors when the file is cat'ed in the shell.
+Output: The script will write to stdout an explanation of each of the steps it took to assign shifts, along with pictures showing the remaining shift preferences after each assignment. Our program will also print a warning for each student who was assigned fewer shifts than he/she requested. A note about redirection: In order to show more clearly the steps taken by the algorithm, colors have been added to highlight certain lines in the explanation. When redirecting stdout to a file, be aware that there may be some formatting strings added by bash to the file. These will return to colors when the file is cat'ed in the shell.
 
 ##### Sample Input and Solution
 Requested shifts:
@@ -90,7 +91,7 @@ Warning: D still needs 1 more hours.
 ```
 
 ## Future Steps
-With more time, there are a couple of additional heuristics/rule-based decisions that we would like to have implemented. 
+For future improvements, here are a couple of additional heuristics/rule-based decisions:
 
 1. Prefer not to assign students multiple non-continuous shifts within the same five hours whenever possible.
 2. If the time slot to be assigned must break up another student's request to two (since the second student cannot work during the hours that will be assigned to the most inflexible student), then choose the time slot such that it breaks up the other student's slot most unevenly.
