@@ -1,3 +1,4 @@
+TotalTimeSlots,10
 Name,HoursNeeded,Start1,End1,...
 A,4,1,9
 B,2,4,8

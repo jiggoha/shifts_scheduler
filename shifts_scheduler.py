@@ -381,19 +381,20 @@ def assign_shift(shift, person):
 
 
 if __name__ == '__main__':
-  if len(sys.argv) != 3:
-    sys.exit("Usage: shifts_scheduler input_path num_blocks")
-
-  TOTAL_HOURS = int(sys.argv[2])
-  times = Times(0, TOTAL_HOURS)
-  final_schedule = Times(0, TOTAL_HOURS)
+  if len(sys.argv) != 2:
+    sys.exit("Usage: shifts_scheduler input_path")
+  filepath = sys.argv[1]
 
   pop = Population()
 
-  filepath = sys.argv[1]
   with open(filepath, 'rb') as csvfile:
     filereader = csv.reader(csvfile, delimiter=',')
-    next(filereader, None)  # skip header
+    
+    total_hours = int(next(filereader)[1])
+    times = Times(0, total_hours)
+    final_schedule = Times(0, total_hours)
+
+    next(filereader, None) # skip header
     
     for row in filereader:
       (name, hours_needed), starts_ends = row[:2], row[2:]
@@ -414,6 +415,7 @@ if __name__ == '__main__':
 
   schedule_shifts()
 
+  print("\n")
   print("\n")
   print(bcolors.OKBLUE + "Final schedule:\n" + bcolors.ENDC)
   final_schedule.pretty_print_assigned(pop)

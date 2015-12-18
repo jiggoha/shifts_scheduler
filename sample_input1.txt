@@ -1,3 +1,4 @@
+TotalTimeSlots,10
 Name,HoursNeeded,Start1,End1,...
 Jay,3,2,8
 Amelia,2,0,3,5,6
